@@ -1,0 +1,8 @@
+rootProject.name = 'learning-spring-boot-video'
+
+include 'volume-1'
+include 'volume-2'
+include 'volume-3'
+include 'volume-4'
+include 'volume-5'
+include 'volume-6'

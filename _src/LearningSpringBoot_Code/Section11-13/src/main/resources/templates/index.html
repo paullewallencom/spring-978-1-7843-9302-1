@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8" />
+    <title>Learning Spring Boot: Spring-a-Gram</title>
+    <link rel="stylesheet" href="/main.css" />
+    <script src="webjars/requirejs/2.2.0/require.js" />
+</head>
+<body>
+
+    <div>
+        <span sec:authentication="name" /> has <span sec:authentication="authorities" />
+        <form sec:authorize-expr="isFullyAuthenticated()" method="post" th:action="@{/logout}">
+            <input type="submit" value="Sign Off" />
+        </form>
+        <form sec:authorize-expr="!isFullyAuthenticated()" method="post" th:action="@{/login}" >
+            <label>User: </label><input type="text" name="username" value="" />
+            <label>Password: </label><input type="password" name="password" />
+            <input type="submit" value="Sign On" />
+        </form>
+    </div>
+
+    <h1>Learning Spring Boot - Video Tutorial</h1>
+
+    <h3 th:if="${#vars['flash.message']}" th:text="${#vars['flash.message']}" class="flash" />
+
+    <div>
+        <h3 th:text="${page.number + 1} + ' of ' + ${page.totalPages}" />
+        <h4 th:text="${page.size} + ' item(s) per page'" />
+        <table>
+            <thead>
+            <tr>
+                <th>Id</th><th>Name</th><th>Owner</th><th>Image</th><th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="image : ${page.content}">
+                <td th:text="${image.id}" />
+                <td th:text="${image.name}" />
+                <td th:text="${image.owner.username}" />
+                <td><a th:href="@{'/images/' + ${image.name} + '/raw'}"><img th:src="@{'/images/' + ${image.name} + '/raw'}" class="thumbnail" /></a></td>
+                <td>
+                    <form sec:authorize-expr="isFullyAuthenticated()" th:method="delete" th:action="@{'/images/' + ${image.name}}">
+                        <input type="submit" value="Delete" />
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <ul>
+            <li th:if="${prev}"><a th:href="@{/(size=${prev.pageSize},page=${prev.pageNumber})}">Previous</a></li>
+            <li th:if="${next}"><a th:href="@{/(size=${next.pageSize},page=${next.pageNumber})}">Next</a></li>
+        </ul>
+
+        <form sec:authorize-url="POST /images" method="post" enctype="multipart/form-data" th:action="@{/images}">
+            <p><input type="file" name="file" /></p>
+            <p><input type="submit" value="Upload" /></p>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        (function() {
+            window.require(['webjars/stompjs/2.3.3/lib/stomp', 'webjars/sockjs-client/1.1.0/dist/sockjs'], function(stomp, SockJS) {
+
+                var redrawCurrentPage = function(message) {
+                    console.log(message);
+                    window.location = /*[[@{/(size=${page.size},page=${page.number})}]]*/'';
+                };
+
+                var socket = SockJS('/imageMessages');
+                var stompClient = Stomp.over(socket);
+                stompClient.connect({/* optional headers */}, function(frame) {
+                    stompClient.subscribe('/topic/newImage', redrawCurrentPage);
+                    stompClient.subscribe('/topic/deleteImage', redrawCurrentPage);
+                });
+            })
+
+        })();
+        /*]]>*/
+    </script>
+
+
+</body>
+</html>

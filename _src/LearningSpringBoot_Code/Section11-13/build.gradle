@@ -1,0 +1,55 @@
+buildscript {
+	ext {
+		springBootVersion = '1.3.5.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+plugins {
+	id "com.gorylenko.gradle-git-properties" version "1.4.16"
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+
+jar {
+	baseName = 'learning-spring-boot-video'
+	version = '0.0.1-SNAPSHOT'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-devtools')
+	compile('org.springframework.boot:spring-boot-starter-security')
+	compile("org.thymeleaf.extras:thymeleaf-extras-springsecurity4")
+	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+	compile('org.springframework.boot:spring-boot-starter-websocket')
+	compile('org.webjars:requirejs:2.2.0')
+	compile('org.webjars.npm:stompjs:2.3.3') {
+		exclude module: 'websocket' // We are using SockJS for websocket functionality
+	}
+	compile('org.webjars.bower:sockjs-client:1.1.0')
+	runtime('com.h2database:h2')
+	testCompile('org.springframework.boot:spring-boot-starter-test') 
+}
+
+
+eclipse {
+	classpath {
+		 containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+		 containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+	}
+}

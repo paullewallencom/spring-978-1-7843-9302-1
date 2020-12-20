@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Learning Spring Boot: Spring-a-Gram</title>
+    <link rel="stylesheet" href="/main.css" />
+</head>
+<body>
+
+    <h1>Learning Spring Boot - Video Tutorial</h1>
+
+    <h3 th:if="${#vars['flash.message']}" th:text="${#vars['flash.message']}" class="flash" />
+
+    <div>
+        <h3 th:text="${page.number + 1} + ' of ' + ${page.totalPages}" />
+        <h4 th:text="${page.size} + ' item(s) per page'" />
+        <table>
+            <thead>
+            <tr>
+                <th>Id</th><th>Name</th><th>Image</th><th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="image : ${page.content}">
+                <td th:text="${image.id}" />
+                <td th:text="${image.name}" />
+                <td><a th:href="@{'/images/' + ${image.name} + '/raw'}"><img th:src="@{'/images/' + ${image.name} + '/raw'}" class="thumbnail" /></a></td>
+                <td>
+                    <form th:method="delete" th:action="@{'/images/' + ${image.name}}">
+                        <input type="submit" value="Delete" />
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <ul>
+            <li th:if="${prev}"><a th:href="@{/(size=${prev.pageSize},page=${prev.pageNumber})}">Previous</a></li>
+            <li th:if="${next}"><a th:href="@{/(size=${next.pageSize},page=${next.pageNumber})}">Next</a></li>
+        </ul>
+
+        <form method="post" enctype="multipart/form-data" action="/images">
+            <p><input type="file" name="file" /></p>
+            <p><input type="submit" value="Upload" /></p>
+        </form>
+    </div>
+
+</body>
+</html>
